@@ -12,7 +12,6 @@ from __future__ import annotations
 import numpy as np
 import torch
 
-
 # ARC uses 10 colors (0-9)
 NUM_COLORS = 10
 MAX_GRID_SIZE = 30

@@ -13,7 +13,7 @@ from __future__ import annotations
 import torch
 import torch.nn as nn
 
-from arc_prize.grid import NUM_COLORS, MAX_GRID_SIZE
+from arc_prize.grid import MAX_GRID_SIZE, NUM_COLORS
 
 
 class RuleConditioner(nn.Module):
@@ -112,7 +112,7 @@ class GridDecoder(nn.Module):
         h = self.combine(combined)  # [B, hidden, 30, 30]
 
         # Decoder layers with FiLM conditioning
-        for layer, conditioner in zip(self.layers, self.conditioners):
+        for layer, conditioner in zip(self.layers, self.conditioners, strict=True):
             h = layer(h)
             h = conditioner(h, z_rule)
 

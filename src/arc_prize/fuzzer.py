@@ -20,12 +20,11 @@ tells us what the model has learned about each task's structure.
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass, field
-from typing import Callable, Dict, List, Optional, Tuple
 
 import numpy as np
 import torch
-
 
 # ---------------------------------------------------------------------------
 # Parametric grid transforms — each maps (grid, intensity) → grid
@@ -62,7 +61,7 @@ class ParametricTransform:
 class TransformChain:
     """Compose multiple (transform, intensity) pairs sequentially."""
 
-    def __init__(self, steps: List[Tuple[ParametricTransform, float]]):
+    def __init__(self, steps: list[tuple[ParametricTransform, float]]):
         self.steps = steps
 
     def __call__(self, grid: np.ndarray) -> np.ndarray:
@@ -73,13 +72,13 @@ class TransformChain:
 
     @staticmethod
     def random_chains(
-        transforms: List[ParametricTransform],
+        transforms: list[ParametricTransform],
         *,
         n_chains: int = 30,
         max_length: int = 3,
-        intensities: List[float] = (0.3, 0.6, 1.0),
+        intensities: list[float] = (0.3, 0.6, 1.0),
         seed: int = 42,
-    ) -> List[TransformChain]:
+    ) -> list[TransformChain]:
         rng = np.random.RandomState(seed)
         chains = []
         for _ in range(n_chains):
@@ -111,7 +110,7 @@ def _color_permute(grid: np.ndarray, intensity: float) -> np.ndarray:
         i, j = rng.choice(len(colors), 2, replace=False)
         colors[i], colors[j] = colors[j], colors[i]
     mapping = {0: 0}
-    for orig, perm in zip(range(1, 10), colors):
+    for orig, perm in zip(range(1, 10), colors, strict=True):
         mapping[orig] = perm
     for r in range(result.shape[0]):
         for c in range(result.shape[1]):
@@ -198,7 +197,7 @@ def _translate(grid: np.ndarray, intensity: float) -> np.ndarray:
     return np.roll(np.roll(grid, shift_r, axis=0), shift_c, axis=1)
 
 
-def make_transform_suite() -> List[ParametricTransform]:
+def make_transform_suite() -> list[ParametricTransform]:
     """Standard suite of ARC grid transforms for structure probing."""
     return [
         # Structural invariants — model should be robust to these
@@ -272,9 +271,9 @@ class StructureProbeReport:
     """Full probe report for one task, analogous to AdvancedBondIndexResult."""
 
     task_id: str
-    probes: List[ProbeResult] = field(default_factory=list)
-    sensitivity_profile: Dict[str, float] = field(default_factory=dict)
-    invariance_profile: Dict[str, float] = field(default_factory=dict)
+    probes: list[ProbeResult] = field(default_factory=list)
+    sensitivity_profile: dict[str, float] = field(default_factory=dict)
+    invariance_profile: dict[str, float] = field(default_factory=dict)
     robustness_index: float = 0.0  # Analogous to Bond Index
 
     def compute_profiles(self):
@@ -326,8 +325,8 @@ class StructureProbe:
     def __init__(
         self,
         encoder: torch.nn.Module,
-        transforms: Optional[List[ParametricTransform]] = None,
-        intensities: List[float] = (0.1, 0.3, 0.5, 0.7, 1.0),
+        transforms: list[ParametricTransform] | None = None,
+        intensities: list[float] = (0.1, 0.3, 0.5, 0.7, 1.0),
     ):
         self.encoder = encoder
         self.transforms = transforms or make_transform_suite()
@@ -336,7 +335,7 @@ class StructureProbe:
     @torch.no_grad()
     def _encode_grid(self, grid: np.ndarray, device: str = "cpu") -> torch.Tensor:
         """Encode a raw grid to latent z using the grid encoder."""
-        from arc_prize.grid import grid_to_tensor, pad_grid, grid_size_mask
+        from arc_prize.grid import grid_size_mask, grid_to_tensor, pad_grid
 
         tensor = grid_to_tensor(grid.tolist(), device=device)
         padded = pad_grid(tensor).unsqueeze(0)  # [1, 10, 30, 30]

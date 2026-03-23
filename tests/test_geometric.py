@@ -3,7 +3,7 @@
 
 import torch
 
-from arc_prize.geometric import PoincareBall, HyperbolicRuleEncoder
+from arc_prize.geometric import HyperbolicRuleEncoder, PoincareBall
 
 
 class TestPoincareBall:

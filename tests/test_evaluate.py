@@ -3,7 +3,7 @@
 
 import numpy as np
 
-from arc_prize.evaluate import exact_match, score_task, cell_accuracy
+from arc_prize.evaluate import cell_accuracy, exact_match, score_task
 
 
 class TestExactMatch:

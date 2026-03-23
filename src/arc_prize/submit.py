@@ -11,18 +11,17 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Dict, List
 
 import numpy as np
 
 
-def format_grid(grid: np.ndarray) -> List[List[int]]:
+def format_grid(grid: np.ndarray) -> list[list[int]]:
     """Convert numpy grid to JSON-serializable list of lists."""
     return grid.astype(int).tolist()
 
 
 def make_submission(
-    predictions: Dict[str, List[List[np.ndarray]]],
+    predictions: dict[str, list[list[np.ndarray]]],
     output_path: str | Path = "submission.json",
 ) -> Path:
     """Create a Kaggle submission JSON file.

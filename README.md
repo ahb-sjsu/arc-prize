@@ -4,14 +4,30 @@
 [![PyPI](https://img.shields.io/pypi/v/arc-prize)](https://pypi.org/project/arc-prize/)
 [![Python](https://img.shields.io/pypi/pyversions/arc-prize)](https://pypi.org/project/arc-prize/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 
 ARC-AGI-2 solver using geometric embeddings, hyperbolic rule inference, and adversarial structure probing.
+
+## The ARC-AGI Challenge
+
+The [Abstraction and Reasoning Corpus](https://arcprize.org/) (ARC) is a benchmark designed to measure general intelligence in AI systems. Each task presents a few input-output grid pairs that demonstrate an abstract transformation rule, and the solver must infer the rule and apply it to unseen test inputs.
+
+**Why it matters:** Unlike language or vision benchmarks where scale and memorization dominate, ARC requires genuine program synthesis from minimal examples. No task appears twice, and the rules span spatial reasoning, counting, symmetry, object manipulation, and compositional logic.
+
+| Milestone | Score | Notes |
+|---|---|---|
+| Human performance | ~98% | Median across crowd-sourced evaluations |
+| ARC-AGI-2 Grand Prize | 85% | **$700,000** — unclaimed as of March 2026 |
+| Current SOTA (unconstrained) | ~54% | Heavily ensembled LLM + search approaches |
+| Current SOTA (Kaggle) | ~24% | Under compute/time constraints |
+
+The Grand Prize requires 85% on the private ARC-AGI-2 evaluation set within a 12-hour Kaggle runtime budget. This repo implements a solver designed for that constraint.
 
 ## Approach
 
 This solver combines three key ideas:
 
-1. **Hyperbolic Rule Encoding** — ARC transformation rules are hierarchical (e.g., "tile the pattern" contains "repeat", "mirror", "offset"). The Poincaré ball naturally represents this hierarchy: general rules near the origin, specific sub-rules near the boundary.
+1. **Hyperbolic Rule Encoding** — ARC transformation rules are hierarchical (e.g., "tile the pattern" contains "repeat", "mirror", "offset"). The Poincare ball naturally represents this hierarchy: general rules near the origin, specific sub-rules near the boundary.
 
 2. **Radar-like Structure Probing** — Parametric transforms at controllable intensity [0,1] are applied to grids and the model's latent response is measured. Transforms the model is *invariant* to reveal learned symmetries; transforms it's *sensitive* to reveal structural features it uses. This is adapted from the [Bond Index](https://github.com/ahb-sjsu/erisml-lib) adversarial fuzzing framework.
 
@@ -20,13 +36,13 @@ This solver combines three key ideas:
 ## Architecture
 
 ```
-Training Pairs → PairEncoder → z_pairs → HyperbolicRuleEncoder → h_rules
-                                                                      ↓
-                                                         Attention Aggregation
-                                                                      ↓
-Test Input → GridEncoder ─────────────────────────→ GridDecoder ← z_rule
-                                                         ↓
-                                                   Output Grid
+Training Pairs -> PairEncoder -> z_pairs -> HyperbolicRuleEncoder -> h_rules
+                                                                        |
+                                                           Attention Aggregation
+                                                                        |
+Test Input -> GridEncoder --------------------------> GridDecoder <- z_rule
+                                                          |
+                                                     Output Grid
 ```
 
 The adversarial training component (gradient reversal) forces the encoder to be invariant to surface features (color palette, position) while remaining sensitive to structural features (pattern, symmetry, count).
@@ -91,9 +107,9 @@ print(f"Robustness Index: {report.robustness_index:.3f}")
 
 | Module | Description |
 |---|---|
-| `grid.py` | Grid ↔ tensor conversion, padding, object extraction |
+| `grid.py` | Grid-tensor conversion, padding, object extraction |
 | `encoder.py` | CNN + attention pooling grid encoder, pair encoder |
-| `geometric.py` | Poincaré ball operations, hyperbolic rule encoder |
+| `geometric.py` | Poincare ball operations, hyperbolic rule encoder |
 | `decoder.py` | FiLM-conditioned CNN grid decoder |
 | `fuzzer.py` | Parametric structure probing (the "radar") |
 | `adversarial.py` | Gradient reversal for surface-invariant encoding |
@@ -102,6 +118,20 @@ print(f"Robustness Index: {report.robustness_index:.3f}")
 | `data.py` | Task loading from JSON / arckit |
 | `evaluate.py` | Exact-match scoring |
 | `submit.py` | Kaggle submission generator |
+
+## Development
+
+```bash
+# Lint
+ruff check src/ tests/
+ruff format src/ tests/
+
+# Test
+pytest
+
+# Test with coverage
+pytest --cov=arc_prize --cov-report=term-missing
+```
 
 ## License
 

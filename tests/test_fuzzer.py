@@ -5,10 +5,10 @@ import numpy as np
 
 from arc_prize.fuzzer import (
     TransformChain,
-    make_transform_suite,
+    _add_noise,
     _color_permute,
     _rotate,
-    _add_noise,
+    make_transform_suite,
 )
 
 

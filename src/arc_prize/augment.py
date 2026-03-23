@@ -10,8 +10,6 @@ these transforms is essentially free data.
 
 from __future__ import annotations
 
-from typing import List, Tuple
-
 import numpy as np
 
 
@@ -41,7 +39,7 @@ def permute_colors(grid: np.ndarray, seed: int = 0) -> np.ndarray:
     return result
 
 
-def all_dihedral(grid: np.ndarray) -> List[np.ndarray]:
+def all_dihedral(grid: np.ndarray) -> list[np.ndarray]:
     """Generate all 8 dihedral group transforms of a grid.
 
     Returns [identity, rot90, rot180, rot270, flip_h, flip_v, diag1, diag2].
@@ -62,7 +60,7 @@ def augment_pair(
     *,
     n_augments: int = 4,
     seed: int = 42,
-) -> List[Tuple[np.ndarray, np.ndarray]]:
+) -> list[tuple[np.ndarray, np.ndarray]]:
     """Augment an input-output pair with consistent transforms.
 
     Applies the SAME transform to both input and output so the

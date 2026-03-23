@@ -142,10 +142,7 @@ def extract_adversarial_labels(
     # Dominant non-background color
     flat = grid_np.flatten()
     non_bg = flat[flat > 0]
-    if len(non_bg) > 0:
-        color_label = int(np.bincount(non_bg).argmax())
-    else:
-        color_label = 0
+    color_label = int(np.bincount(non_bg).argmax()) if len(non_bg) > 0 else 0
 
     # Grid size bin: <5, <10, <15, <20, <25, >=25
     max_dim = max(h, w)

@@ -9,8 +9,6 @@ Each task allows 2 attempts — if either matches, the task is scored correct.
 
 from __future__ import annotations
 
-from typing import Dict, List, Tuple
-
 import numpy as np
 
 
@@ -22,8 +20,8 @@ def exact_match(predicted: np.ndarray, target: np.ndarray) -> bool:
 
 
 def score_task(
-    predictions: List[List[np.ndarray]],
-    targets: List[np.ndarray],
+    predictions: list[list[np.ndarray]],
+    targets: list[np.ndarray],
 ) -> bool:
     """Score a single task.  Each test input gets 2 attempts.
 
@@ -34,16 +32,16 @@ def score_task(
     Returns:
         True if ALL test inputs have at least one correct candidate.
     """
-    for preds, target in zip(predictions, targets):
+    for preds, target in zip(predictions, targets, strict=True):
         if not any(exact_match(p, target) for p in preds):
             return False
     return True
 
 
 def score_submission(
-    all_predictions: Dict[str, List[List[np.ndarray]]],
-    all_targets: Dict[str, List[np.ndarray]],
-) -> Tuple[int, int, float]:
+    all_predictions: dict[str, list[list[np.ndarray]]],
+    all_targets: dict[str, list[np.ndarray]],
+) -> tuple[int, int, float]:
     """Score a full submission.
 
     Args:
@@ -58,9 +56,8 @@ def score_submission(
 
     for task_id, targets in all_targets.items():
         n_total += 1
-        if task_id in all_predictions:
-            if score_task(all_predictions[task_id], targets):
-                n_correct += 1
+        if task_id in all_predictions and score_task(all_predictions[task_id], targets):
+            n_correct += 1
 
     accuracy = n_correct / max(n_total, 1)
     return n_correct, n_total, accuracy

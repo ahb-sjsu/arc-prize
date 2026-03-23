@@ -12,13 +12,12 @@ from __future__ import annotations
 import json
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, List, Tuple
 
 import numpy as np
 import torch
 from torch.utils.data import Dataset
 
-from arc_prize.grid import grid_to_tensor, pad_grid, grid_size_mask
+from arc_prize.grid import grid_size_mask, grid_to_tensor, pad_grid
 
 
 @dataclass
@@ -34,8 +33,8 @@ class ARCTask:
     """A complete ARC task with training and test pairs."""
 
     task_id: str
-    train: List[ARCPair]
-    test: List[ARCPair]
+    train: list[ARCPair]
+    test: list[ARCPair]
 
     @property
     def n_train(self) -> int:
@@ -64,7 +63,7 @@ def load_task_from_json(path: Path) -> ARCTask:
     return ARCTask(task_id=path.stem, train=train, test=test)
 
 
-def load_tasks_from_dir(task_dir: Path) -> List[ARCTask]:
+def load_tasks_from_dir(task_dir: Path) -> list[ARCTask]:
     """Load all ARC tasks from a directory of JSON files."""
     tasks = []
     for path in sorted(task_dir.glob("*.json")):
@@ -72,15 +71,15 @@ def load_tasks_from_dir(task_dir: Path) -> List[ARCTask]:
     return tasks
 
 
-def load_arckit_tasks() -> Tuple[List[ARCTask], List[ARCTask]]:
+def load_arckit_tasks() -> tuple[list[ARCTask], list[ARCTask]]:
     """Load ARC-AGI-1 tasks via the arckit package.
 
     Returns (training_tasks, evaluation_tasks).
     """
     try:
         import arckit
-    except ImportError:
-        raise ImportError("Install arckit: pip install arckit")
+    except ImportError as err:
+        raise ImportError("Install arckit: pip install arckit") from err
 
     train_set, eval_set = arckit.load_data()
 
@@ -90,14 +89,14 @@ def load_arckit_tasks() -> Tuple[List[ARCTask], List[ARCTask]]:
                 input=np.array(inp, dtype=np.int64),
                 output=np.array(out, dtype=np.int64),
             )
-            for inp, out in zip(task.train_inputs, task.train_outputs)
+            for inp, out in zip(task.train_inputs, task.train_outputs, strict=True)
         ]
         test = [
             ARCPair(
                 input=np.array(inp, dtype=np.int64),
                 output=np.array(out, dtype=np.int64),
             )
-            for inp, out in zip(task.test_inputs, task.test_outputs)
+            for inp, out in zip(task.test_inputs, task.test_outputs, strict=True)
         ]
         return ARCTask(task_id=task.id, train=train, test=test)
 
@@ -119,13 +118,13 @@ class ARCDataset(Dataset):
 
     def __init__(
         self,
-        tasks: List[ARCTask],
+        tasks: list[ARCTask],
         augment: bool = False,
         n_augments: int = 4,
         device: str = "cpu",
     ):
         self.device = device
-        self.items: List[Tuple[ARCPair, str]] = []
+        self.items: list[tuple[ARCPair, str]] = []
         for task in tasks:
             for pair in task.train:
                 self.items.append((pair, task.task_id))
@@ -148,7 +147,7 @@ class ARCDataset(Dataset):
     def __len__(self) -> int:
         return len(self.items)
 
-    def __getitem__(self, idx: int) -> Dict[str, torch.Tensor | str]:
+    def __getitem__(self, idx: int) -> dict[str, torch.Tensor | str]:
         pair, task_id = self.items[idx]
 
         in_t = grid_to_tensor(pair.input.tolist(), device=self.device)

@@ -18,21 +18,20 @@ Pipeline:
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import List, Optional, Tuple
 
 import numpy as np
 import torch
 import torch.nn as nn
 import torch.optim as optim
 
+from arc_prize.decoder import GridDecoder
+from arc_prize.encoder import GridEncoder, PairEncoder
+from arc_prize.geometric import HyperbolicRuleEncoder, PoincareBall
 from arc_prize.grid import (
+    grid_size_mask,
     grid_to_tensor,
     pad_grid,
-    grid_size_mask,
 )
-from arc_prize.encoder import PairEncoder, GridEncoder
-from arc_prize.decoder import GridDecoder
-from arc_prize.geometric import HyperbolicRuleEncoder, PoincareBall
 
 
 @dataclass
@@ -60,7 +59,7 @@ class ARCSolver(nn.Module):
     iterative refinement into a single module.
     """
 
-    def __init__(self, config: Optional[SolverConfig] = None):
+    def __init__(self, config: SolverConfig | None = None):
         super().__init__()
         self.config = config or SolverConfig()
         c = self.config
@@ -92,7 +91,7 @@ class ARCSolver(nn.Module):
         self,
         grid: np.ndarray,
         device: str,
-    ) -> Tuple[torch.Tensor, torch.Tensor]:
+    ) -> tuple[torch.Tensor, torch.Tensor]:
         """Encode a single grid to padded tensor + mask."""
         t = grid_to_tensor(grid.tolist(), device=device)
         padded = pad_grid(t)
@@ -102,7 +101,7 @@ class ARCSolver(nn.Module):
 
     def infer_rule(
         self,
-        train_pairs: List[Tuple[np.ndarray, np.ndarray]],
+        train_pairs: list[tuple[np.ndarray, np.ndarray]],
         device: str,
     ) -> torch.Tensor:
         """Infer transformation rule from training pairs.
@@ -157,7 +156,7 @@ class ARCSolver(nn.Module):
 
     def refine_on_task(
         self,
-        train_pairs: List[Tuple[np.ndarray, np.ndarray]],
+        train_pairs: list[tuple[np.ndarray, np.ndarray]],
         device: str,
     ) -> torch.Tensor:
         """Test-time training: refine the model on a specific task.
@@ -186,7 +185,7 @@ class ARCSolver(nn.Module):
         optimizer = optim.Adam(params, lr=self.config.refine_lr)
 
         self.train()
-        for step in range(self.config.refine_steps):
+        for _step in range(self.config.refine_steps):
             optimizer.zero_grad()
             total_loss = torch.tensor(0.0, device=device)
 
@@ -233,11 +232,11 @@ class ARCSolver(nn.Module):
     @torch.no_grad()
     def solve_task(
         self,
-        train_pairs: List[Tuple[np.ndarray, np.ndarray]],
-        test_inputs: List[np.ndarray],
+        train_pairs: list[tuple[np.ndarray, np.ndarray]],
+        test_inputs: list[np.ndarray],
         *,
         refine: bool = True,
-    ) -> List[List[np.ndarray]]:
+    ) -> list[list[np.ndarray]]:
         """Solve a complete ARC task.
 
         Args:

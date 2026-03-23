@@ -5,11 +5,11 @@ import numpy as np
 import torch
 
 from arc_prize.grid import (
-    grid_to_tensor,
-    tensor_to_grid,
-    pad_grid,
-    grid_size_mask,
     extract_objects,
+    grid_size_mask,
+    grid_to_tensor,
+    pad_grid,
+    tensor_to_grid,
 )
 
 

@@ -1,0 +1,42 @@
+11.4s 1 0.00s - Debugger warning: It seems that frozen modules are being used, which may
+11.4s 2 0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off
+11.4s 3 0.00s - to python to disable frozen modules.
+11.4s 4 0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.
+12.3s 5 0.00s - Debugger warning: It seems that frozen modules are being used, which may
+12.3s 6 0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off
+12.3s 7 0.00s - to python to disable frozen modules.
+12.3s 8 0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.
+17.8s 9 PyTorch: 2.9.0+cpu
+17.8s 10 CUDA available: False
+18.8s 11 Traceback (most recent call last):
+18.8s 12 File "<string>", line 1, in <module>
+18.8s 13 File "/usr/local/lib/python3.12/dist-packages/papermill/execute.py", line 131, in execute_notebook
+18.8s 14 raise_for_execution_errors(nb, output_path)
+18.8s 15 File "/usr/local/lib/python3.12/dist-packages/papermill/execute.py", line 251, in raise_for_execution_errors
+18.8s 16 raise error
+18.8s 17 papermill.exceptions.PapermillExecutionError:
+18.8s 18 ---------------------------------------------------------------------------
+18.8s 19 Exception encountered at "In [2]":
+18.8s 20 ---------------------------------------------------------------------------
+18.8s 21 ModuleNotFoundError                       Traceback (most recent call last)
+18.8s 22 /tmp/ipykernel_17/1051531099.py in <cell line: 0>()
+18.8s 23 ----> 1 from arc_prize.data import ARCTask, ARCPair, load_arckit_tasks
+18.8s 24 2
+18.8s 25 3 def load_arc_json(path):
+18.8s 26 4     """Load tasks from ARC JSON format (competition format)."""
+18.8s 27 5     with open(path) as f:
+18.8s 28 
+18.8s 29 ModuleNotFoundError: No module named 'arc_prize'
+18.8s 30 
+21.8s 31 /usr/local/lib/python3.12/dist-packages/mistune.py:435: SyntaxWarning: invalid escape sequence '\|'
+21.8s 32 cells[i][c] = re.sub('\\\\\|', '|', cell)
+22.1s 33 /usr/local/lib/python3.12/dist-packages/nbconvert/filters/filter_links.py:36: SyntaxWarning: invalid escape sequence '\_'
+22.1s 34 text = re.sub(r'_', '\_', text) # Escape underscores in display text
+22.9s 35 /usr/local/lib/python3.12/dist-packages/traitlets/traitlets.py:2915: FutureWarning: --Exporter.preprocessors=["remove_papermill_header.RemovePapermillHeader"] for containers is deprecated in traitlets 5.0. You can pass `--Exporter.preprocessors item` ... multiple times to add items to a list.
+22.9s 36 warn(
+22.9s 37 [NbConvertApp] Converting notebook __notebook__.ipynb to notebook
+23.3s 38 [NbConvertApp] Writing 25133 bytes to __notebook__.ipynb
+26.5s 39 /usr/local/lib/python3.12/dist-packages/traitlets/traitlets.py:2915: FutureWarning: --Exporter.preprocessors=["nbconvert.preprocessors.ExtractOutputPreprocessor"] for containers is deprecated in traitlets 5.0. You can pass `--Exporter.preprocessors item` ... multiple times to add items to a list.
+26.5s 40 warn(
+26.5s 41 [NbConvertApp] Converting notebook __notebook__.ipynb to html
+27.7s 42 [NbConvertApp] Writing 341139 bytes to __results__.html
