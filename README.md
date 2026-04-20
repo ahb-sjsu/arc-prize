@@ -35,14 +35,36 @@ This solver combines three key ideas:
 
 ## Architecture
 
-```
-Training Pairs -> PairEncoder -> z_pairs -> HyperbolicRuleEncoder -> h_rules
-                                                                        |
-                                                           Attention Aggregation
-                                                                        |
-Test Input -> GridEncoder --------------------------> GridDecoder <- z_rule
-                                                          |
-                                                     Output Grid
+```mermaid
+flowchart LR
+    TP[Training pairs]
+    PE[PairEncoder]
+    Z[z_pairs]
+    HR[HyperbolicRuleEncoder]
+    HRU[h_rules on Poincare ball]
+    ATT[Attention aggregation]
+    ZR[z_rule]
+    TEST[Test input grid]
+    GE[GridEncoder]
+    GD[GridDecoder]
+    OUT[Output grid]
+
+    TP --> PE --> Z --> HR --> HRU --> ATT --> ZR
+    TEST --> GE --> GD
+    ZR --> GD
+    GD --> OUT
+
+    subgraph PROBE[Radar probing]
+      TR[Parametric transforms<br/>intensity 0 to 1]
+      INV[Invariances]
+      SENS[Sensitivities]
+      TR --> INV
+      TR --> SENS
+    end
+    HRU --> PROBE
+
+    TT[Test-time refinement<br/>per-task fine-tune on augmentations]
+    HRU --> TT --> GD
 ```
 
 The adversarial training component (gradient reversal) forces the encoder to be invariant to surface features (color palette, position) while remaining sensitive to structural features (pattern, symmetry, count).
